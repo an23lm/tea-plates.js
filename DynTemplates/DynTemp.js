@@ -1,25 +1,40 @@
 class DynamicTemplate {
 
+    delta=80;
+    animationTime=300;
+
     constructor(wrapperId, template, loadingTemplate) {
-        this.jsonData = undefined;
+        this.jsonData = [];
         this.wrapperId = wrapperId;
         this.template = template;
         this.loadingTemplate = loadingTemplate;
-        this.templateObjects = [];
-        this.templateKeys = [];
-        this.elements = [];
+        this.newElements = [];
+        this.insertedElements = [];
         this.loadingElements = [];
     }
 
     setData(jdata) {
-        this.jsonData = jdata;
-        if (Array.isArray(this.jsonData)) {
-            this.templateObjects = this.jsonData.map(
+        let templateObjects = [];
+        if (Array.isArray(jdata)) {
+            templateObjects = jdata.map(
                 (data) => this.template(data)
             );
+            this.jsonData.push(...jdata);
         } else {
-            this.templateObjects = this.template(data);
+            templateObjects.push(this.template(data));
+            this.jsonData.push(jdata);
         }
+
+        let tempNE = templateObjects
+            .map((item, index) => 
+                this.createElementFromString(item, index)
+            );        
+        this.newElements.push(...tempNE);
+    }
+
+    removeData() {
+        this.jsonData = [];
+        this.newElements = [];
     }
 
     // parseTemplate() {
@@ -37,56 +52,55 @@ class DynamicTemplate {
     //     return templateObject;
     // }
 
-    insertObjects(delta=80, completion=()=>{}) {
+    insertObjects(completion=()=>{}) {
         let completionPromise = [];
-        this.elements = this.templateObjects.map((item, index) => 
-                this.createElementFromString(item, index)
-            );
-        this.elements.forEach((element, index) => {
-            let promise = new Promise((resolve, reject) => {
+        this.newElements.forEach((element, index) => {
+            let promise = new Promise((resolve, _reject) => {
                 setTimeout(() => {
                     element.classList.add("animate-in");
                     document.getElementById(this.wrapperId).appendChild(element);
                     setTimeout(() => {
                         resolve()
                     }, 300);
-                }, delta * index, element);
+                }, (this.delta * index), element);
             });
             completionPromise.push(promise);
         });
 
         Promise.all(completionPromise)
-            .then(() => completion());
+            .then(() => {
+                this.insertedElements.push(...this.newElements);
+                this.newElements = [];
+                completion();
+            });
     }
 
-    removeAllObjects(delta=80, animationTime=300, completion=()=>{}) {
+    removeAllObjects(completion=()=>{}) {
         let completionPromise = [];
-        this.elements.slice().reverse()
+        this.insertedElements.slice().reverse()
             .forEach((element, index) => {
-                let promise = new Promise((resolve, reject) => {
+                let promise = new Promise((resolve, _reject) => {
                     setTimeout(() => {
                         element.classList.remove("animate-in");
                         element.classList.add("animate-out");
                         setTimeout(() => {
                             document.getElementById(this.wrapperId).removeChild(element);
                             resolve();
-                        }, animationTime, element, this, index);
-                    }, delta * index, element, this, index);
+                        }, this.animationTime, element, this, index);
+                    }, this.delta * index, element, this, index);
                 });
                 completionPromise.push(promise);
             }
         );
         Promise.all(completionPromise)
             .then(() => {
-                console.log('done');
+                this.insertedElements = [];
                 completion();
-            })
-            .catch((err) => { console.log(err); });
+            });
     }
 
-    removeObject(index, animationTime=300, completion=()=>{}) {
-        let element = this.elements[index];
-        this.elements.splice(index, 1);
+    removeObject(index, completion=()=>{}) {
+        let element = this.insertedElements[index];
         let elementStyle = window.getComputedStyle(element);
         let height = element.offsetHeight;
         let marginTop = index > 0 ? parseFloat(elementStyle.marginTop) : 0;
@@ -97,9 +111,10 @@ class DynamicTemplate {
         element.style.marginTop = rmMargin + 'px';
 
         setTimeout(() => {
+            this.insertedElements.splice(index, 1);
             document.getElementById(this.wrapperId).removeChild(element);
             completion();
-        }, animationTime, element, this, index);
+        }, this.animationTime, element, this, index);
     }
 
     createElementFromString(htmlString, uid=-1) {
@@ -109,7 +124,7 @@ class DynamicTemplate {
         return div.firstChild;
     }
 
-    showLoading(count=1, delta=80, completion=()=>{}) {
+    showLoading(count=1, completion=()=>{}) {
         for(let i = 0; i < count; i++) {
             this.loadingElements.push(this.createElementFromString(this.loadingTemplate, `load-${i}`));
         }
@@ -122,7 +137,7 @@ class DynamicTemplate {
                     setTimeout(() => {
                         resolve()
                     }, 300);
-                }, delta * index, element);
+                }, this.delta * index, element);
             });
             completionPromise.push(promise);
         });
@@ -131,7 +146,7 @@ class DynamicTemplate {
             .then(() => completion());
     }
 
-    hideLoading(delta=80, animationTime=300, completion=()=>{}) {
+    hideLoading(completion=()=>{}) {
         let completionPromise = [];
         this.loadingElements.slice().reverse()
             .forEach((element, index) => {
@@ -142,8 +157,8 @@ class DynamicTemplate {
                         setTimeout(() => {
                             document.getElementById(this.wrapperId).removeChild(element);
                             resolve();
-                        }, animationTime, element, this, index);
-                    }, delta * index, element, this, index);
+                        }, this.animationTime, element, this, index);
+                    }, this.delta * index, element, this, index);
                 });
                 completionPromise.push(promise);
             }
