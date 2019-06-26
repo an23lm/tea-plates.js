@@ -99,7 +99,7 @@ body {
 }
 
 .notification {
-    position: absolute; 
+    position: absolute;
     right: 4pt;
     top: 4pt;
     height: 20pt;
@@ -120,9 +120,11 @@ body {
     0% {
         transform: scale(1);
     }
+
     50% {
         transform: scale(0.95);
     }
+
     100% {
         transform: scale(1);
     }
@@ -133,6 +135,7 @@ body {
         transform: scale(0.9);
         opacity: 0;
     }
+
     to {
         transform: scale(1);
         opacity: 1;

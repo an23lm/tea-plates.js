@@ -41,7 +41,10 @@ class TeaPlates {
     }
 
     pTP_createTemplate(templateString, uid) {
-        return {'templateString': templateString, 'uid': uid};
+        return {
+            'templateString': templateString,
+            'uid': uid
+        };
     }
 
     removeData() {
@@ -135,7 +138,9 @@ class TeaPlates {
             let ref;
             element.addEventListener(
                 eventListener.type,
-                ref = function(e) { handler.call(this, e, self, eventListener.handler) },
+                ref = function (e) {
+                    handler.call(this, e, self, eventListener.handler)
+                },
                 eventListener.options)
             eventListener['handerRef'] = ref;
         });
