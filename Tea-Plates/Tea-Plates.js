@@ -1,39 +1,51 @@
-class DynamicTemplate {
+class TeaPlates {
 
-    delta=80;
-    animationTime=300;
+    delta = 80;
+    animationTime = 300;
+
+    pTP_uid = 0;
 
     constructor(wrapperId, template, loadingTemplate) {
-        this.jsonData = [];
+        this.jsonData = {};
         this.wrapperId = wrapperId;
         this.template = template;
         this.loadingTemplate = loadingTemplate;
         this.newElements = [];
         this.insertedElements = [];
         this.loadingElements = [];
+        this.eventListeners = [];
     }
 
     setData(jdata) {
         let templateObjects = [];
         if (Array.isArray(jdata)) {
             templateObjects = jdata.map(
-                (data) => this.template(data)
+                (data) => {
+                    this.jsonData[`uid-${++this.pTP_uid}`] = data;
+                    return this.pTP_createTemplate(this.template(data), this.pTP_uid);
+                }
             );
-            this.jsonData.push(...jdata);
         } else {
-            templateObjects.push(this.template(data));
-            this.jsonData.push(jdata);
+            this.jsonData[`uid-${++this.pTP_uid}`] = jdata;
+            let tmp = this.pTP_createTemplate(this.template(jdata), this.pTP_uid);
+            templateObjects.push(tmp);
         }
 
-        let tempNE = templateObjects
-            .map((item, index) => 
-                this.createElementFromString(item, index)
-            );        
+        let tempNE = templateObjects.map(
+            item => this.pTP_CreateElementFromString(item.templateString, item.uid)
+        );
         this.newElements.push(...tempNE);
+        this.eventListeners.forEach(
+            listener => this.pTP_AddEventListeners(this.newElements, listener)
+        );
+    }
+
+    pTP_createTemplate(templateString, uid) {
+        return {'templateString': templateString, 'uid': uid};
     }
 
     removeData() {
-        this.jsonData = [];
+        this.jsonData = {};
         this.newElements = [];
     }
 
@@ -52,7 +64,7 @@ class DynamicTemplate {
     //     return templateObject;
     // }
 
-    insertObjects(completion=()=>{}) {
+    insertObjects(completion = () => {}) {
         let completionPromise = [];
         this.newElements.forEach((element, index) => {
             let promise = new Promise((resolve, _reject) => {
@@ -76,7 +88,7 @@ class DynamicTemplate {
             });
     }
 
-    removeAllObjects(completion=()=>{}) {
+    removeAllObjects(completion = () => {}) {
         let completionPromise = [];
         this.insertedElements.slice().reverse()
             .forEach((element, index) => {
@@ -90,8 +102,7 @@ class DynamicTemplate {
                     }, this.delta * index, element, this, index);
                 });
                 completionPromise.push(promise);
-            }
-        );
+            });
         Promise.all(completionPromise)
             .then(() => {
                 this.insertedElements = [];
@@ -99,7 +110,50 @@ class DynamicTemplate {
             });
     }
 
-    removeObject(index, completion=()=>{}) {
+    registerEventListeners(eventType, eventHandler, options = false) {
+        let listener = {
+            'type': eventType,
+            'handler': eventHandler,
+            'options': options
+        };
+        let index = this.eventListeners.push(listener) - 1;
+        this.pTP_AddEventListeners(this.insertedElements, listener);
+        this.pTP_AddEventListeners(this.newElements, listener);
+        return index
+    }
+
+    unregisterEventListeners(index) {
+        let removedEL = this.eventListeners.splice(index, 1);
+        this.pTP_RemoveEventListeners(this.insertedElements, removedEL);
+        this.pTP_RemoveEventListeners(this.newElements, removedEL);
+        return removedEL;
+    }
+
+    pTP_AddEventListeners(elements, eventListener) {
+        let self = this;
+        elements.forEach(element => {
+            let ref;
+            element.addEventListener(
+                eventListener.type,
+                ref = function(e) { handler.call(this, e, self, eventListener.handler) },
+                eventListener.options)
+            eventListener['handerRef'] = ref;
+        });
+
+        function handler(event, self, eventHandler) {
+            let uid = this.getAttribute('uid');
+            let data = self.jsonData[`uid-${uid}`];
+            eventHandler.call(this, event, data);
+        }
+    }
+
+    pTP_RemoveEventListeners(elements, eventListener) {
+        elements.forEach(element =>
+            element.removeEventListener(eventListener.type, eventListener.handerRef, eventListener.options)
+        );
+    }
+
+    removeObject(index, completion = () => {}) {
         let element = this.insertedElements[index];
         let elementStyle = window.getComputedStyle(element);
         let height = element.offsetHeight;
@@ -115,16 +169,16 @@ class DynamicTemplate {
         }, this.animationTime, element, this, index);
     }
 
-    createElementFromString(htmlString, uid=-1) {
+    pTP_CreateElementFromString(htmlString, uid = -1) {
         var div = document.createElement('div');
         div.innerHTML = htmlString;
-        div.firstChild.setAttribute('uid', `${this.wrapperId}-${uid}`);
+        div.firstChild.setAttribute('uid', uid);
         return div.firstChild;
     }
 
-    showLoading(count=1, completion=()=>{}) {
-        for(let i = 0; i < count; i++) {
-            this.loadingElements.push(this.createElementFromString(this.loadingTemplate, `load-${i}`));
+    showLoading(count = 1, completion = () => {}) {
+        for (let i = 0; i < count; i++) {
+            this.loadingElements.push(this.pTP_CreateElementFromString(this.loadingTemplate, `load-${i}`));
         }
         let completionPromise = [];
         this.loadingElements.forEach((element, index) => {
@@ -145,7 +199,7 @@ class DynamicTemplate {
             .then(() => completion());
     }
 
-    hideLoading(completion=()=>{}) {
+    hideLoading(completion = () => {}) {
         let completionPromise = [];
         this.loadingElements.slice().reverse()
             .forEach((element, index) => {
@@ -159,8 +213,7 @@ class DynamicTemplate {
                     }, this.delta * index, element, this, index);
                 });
                 completionPromise.push(promise);
-            }
-        );
+            });
         Promise.all(completionPromise)
             .then(() => {
                 this.loadingElements = [];

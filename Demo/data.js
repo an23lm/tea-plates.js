@@ -1,4 +1,4 @@
-data = [
+jsondata = [
 {
     "first-name": "Spongebob",
     "last-name": "Squarepants",
