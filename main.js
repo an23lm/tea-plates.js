@@ -1,8 +1,8 @@
 function setup() {
-    let loadingTemplate = 
-    `<div class="poc-loading-block">
-        <div class="loading-address"></div>
-    </div>`;
+    let loadingTemplate =
+        `<div class="poc-loading-block">
+            <div class="loading-address"></div>
+        </div>`;
 
     let template = (data) => {
         let ts = `<div class="poc-block">`
@@ -18,7 +18,7 @@ function setup() {
         return ts;
     }
 
-    function onclick (event, data) {
+    function onclick(event, data) {
         alert('clicked');
         console.log(data);
     }
