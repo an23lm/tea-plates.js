@@ -1,7 +1,7 @@
 function setup() {
     let loadingTemplate = 
     `<div class="poc-loading-block">
-        Loading
+        <div class="loading-address"></div>
     </div>`;
 
     let template = (data) => {
@@ -21,21 +21,45 @@ function setup() {
     newTemplate1.showLoading(1);
 
     setTimeout(() => {
-        insertData(() => {
+        insertData(newTemplate1, () => {
             newTemplate1.showLoading(2);
             setTimeout(() => {
-                insertData();
+                insertData(newTemplate1);
             }, 5000)
         });
     }, 5000)
 
-    function insertData(completion) {
+    function insertData(templateObject, completion) {
         function newDS() {
-            newTemplate1.setData(jsondata);
-            newTemplate1.insertObjects(completion);
+            templateObject.setData(jsondata);
+            templateObject.insertObjects(completion);
         }
-        newTemplate1.hideLoading(newDS);
+        templateObject.hideLoading(newDS);
     }
+
+    var newTemplate2 = new DynamicTemplate('poc-wrapper-2', template, loadingTemplate);
+    newTemplate2.showLoading(3);
+    setTimeout(() => {
+        insertData(newTemplate2);
+    }, 9000)
+
+    var newTemplate3 = new DynamicTemplate('poc-wrapper-3', template, loadingTemplate);
+    newTemplate3.showLoading(4);
+    setTimeout(() => {
+        insertData(newTemplate3);
+    }, 10000)
+
+    var newTemplate4 = new DynamicTemplate('poc-wrapper-4', template, loadingTemplate);
+    newTemplate4.showLoading(2);
+    setTimeout(() => {
+        insertData(newTemplate4);
+    }, 3000)
+
+    var newTemplate5 = new DynamicTemplate('poc-wrapper-5', template, loadingTemplate);
+    newTemplate5.showLoading(5);
+    setTimeout(() => {
+        insertData(newTemplate5);
+    }, 12000)
 }
 
 window.onload = setup;

@@ -29,6 +29,7 @@ body {
 }
 
 .poc-block {
+    position: relative;
     padding: 20pt;
     border-radius: 5pt;
     background: #c8dad3;
@@ -46,10 +47,20 @@ body {
     z-index: 100;
     box-shadow: #32323250 2px 2px 15px;
     transition: margin-top .3s ease-in-out;
+    animation: loadingAnimation 2s infinite .3s;
+}
+
+.loading-address {
+    padding: 8pt;
+    background: #63707e;
+    border-radius: 5pt;
+    margin-top: 8pt;
+    box-shadow: #32323250 2px 2px 15px;
+    min-height: 15pt;
 }
 
 .poc-loading-block.animate-in {
-    animation: expand .3s ease-in-out, loadingAnimation 2s infinite .3s;
+    animation: expand .3s ease-in-out;
     animation-fill-mode: forwards;
 }
 
@@ -88,7 +99,7 @@ body {
 }
 
 .notification {
-    position: absolute;
+    position: absolute; 
     right: 4pt;
     top: 4pt;
     height: 20pt;

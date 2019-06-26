@@ -60,8 +60,9 @@ class DynamicTemplate {
                     element.classList.add("animate-in");
                     document.getElementById(this.wrapperId).appendChild(element);
                     setTimeout(() => {
+                        element.classList.remove("animate-in");
                         resolve()
-                    }, 300);
+                    }, this.animationTime, element, this);
                 }, (this.delta * index), element);
             });
             completionPromise.push(promise);
@@ -81,7 +82,6 @@ class DynamicTemplate {
             .forEach((element, index) => {
                 let promise = new Promise((resolve, _reject) => {
                     setTimeout(() => {
-                        element.classList.remove("animate-in");
                         element.classList.add("animate-out");
                         setTimeout(() => {
                             document.getElementById(this.wrapperId).removeChild(element);
@@ -105,8 +105,6 @@ class DynamicTemplate {
         let height = element.offsetHeight;
         let marginTop = index > 0 ? parseFloat(elementStyle.marginTop) : 0;
         let rmMargin = -(height + marginTop);
-        element.style.zIndex = "-1";
-        element.classList.remove("animate-in");
         element.classList.add("animate-out");
         element.style.marginTop = rmMargin + 'px';
 
@@ -135,8 +133,9 @@ class DynamicTemplate {
                     element.classList.add("animate-in");
                     document.getElementById(this.wrapperId).appendChild(element);
                     setTimeout(() => {
+                        element.classList.remove("animate-in");
                         resolve()
-                    }, 300);
+                    }, this.animationTime, element, this);
                 }, this.delta * index, element);
             });
             completionPromise.push(promise);
@@ -152,7 +151,6 @@ class DynamicTemplate {
             .forEach((element, index) => {
                 let promise = new Promise((resolve, _reject) => {
                     setTimeout(() => {
-                        element.classList.remove("animate-in");
                         element.classList.add("animate-out");
                         setTimeout(() => {
                             document.getElementById(this.wrapperId).removeChild(element);
