@@ -158,8 +158,32 @@ class TeaPlates {
         );
     }
 
-    removeObject(index, completion = () => {}) {
+    removeObjectAtIndex(index, completion = () => {}) {
         let element = this.insertedElements[index];
+        let elementStyle = window.getComputedStyle(element);
+        let height = element.offsetHeight;
+        let marginTop = index > 0 ? parseFloat(elementStyle.marginTop) : 0;
+        let rmMargin = -(height + marginTop);
+        element.classList.add("animate-out");
+        element.style.marginTop = rmMargin + 'px';
+
+        setTimeout(() => {
+            this.insertedElements.splice(index, 1);
+            document.getElementById(this.wrapperId).removeChild(element);
+            completion();
+        }, this.animationTime, element, this, index);
+    }
+
+    removeObjectWithUID(uid, completion = () => {}) {
+        let element = undefined;
+        let index = undefined;
+        this.insertedElements.forEach((ele, i) => {
+            if (ele.getAttribute('uid') == uid) {
+                element = ele;
+                index = i;
+            }
+        });
+        if (element == undefined) return;
         let elementStyle = window.getComputedStyle(element);
         let height = element.offsetHeight;
         let marginTop = index > 0 ? parseFloat(elementStyle.marginTop) : 0;
