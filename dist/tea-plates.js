@@ -196,6 +196,8 @@ class TeaPlates {
             document.getElementById(this.wrapperId).removeChild(element);
             completion();
         }, this.animationTime, element, this, index);
+
+        return this.jsonData[`uid-${uid}`];
     }
 
     pTP_CreateElementFromString(htmlString, uid = -1) {
