@@ -29,10 +29,7 @@ function setup() {
 
     setTimeout(() => {
         insertData(newTemplate1, () => {
-            newTemplate1.showLoading(2);
-            setTimeout(() => {
-                insertData(newTemplate1);
-            }, 5000)
+            newTemplate1.removeObjectWithUID(2);
         });
     }, 5000)
 
