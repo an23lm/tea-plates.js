@@ -181,6 +181,7 @@ class TeaPlates {
             if (ele.getAttribute('uid') == uid) {
                 element = ele;
                 index = i;
+                break;
             }
         });
         if (element == undefined) return;
