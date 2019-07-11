@@ -27,12 +27,6 @@ function setup() {
     newTemplate1.registerEventListeners('click', onclick);
     newTemplate1.showLoading(1);
 
-    setTimeout(() => {
-        insertData(newTemplate1, () => {
-            newTemplate1.removeObjectWithUID(2);
-        });
-    }, 5000)
-
     function insertData(templateObject, completion) {
         function newDS() {
             templateObject.setData(jsondata);
@@ -46,6 +40,15 @@ function setup() {
     setTimeout(() => {
         insertData(newTemplate2);
     }, 9000)
+
+    setTimeout(() => {
+        insertData(newTemplate1, () => {
+            var obj = newTemplate1.removeObjectWithUID(2);
+            newTemplate2.setData(obj);
+            newTemplate2.insertObjects();
+            
+        });
+    }, 5000)
 
     var newTemplate3 = new TeaPlates('poc-wrapper-3', template, loadingTemplate);
     newTemplate3.showLoading(4);
