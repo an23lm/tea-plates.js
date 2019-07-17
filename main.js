@@ -27,46 +27,60 @@ function setup() {
     newTemplate1.registerEventListeners('click', onclick);
     newTemplate1.showLoading(1);
 
-    function insertData(templateObject, completion) {
-        function newDS() {
-            templateObject.setData(jsondata);
-            templateObject.insertObjects(completion);
-        }
-        templateObject.hideLoading(newDS);
+    function newDS() {
+        newTemplate1.setData(jsondata);
+        newTemplate1.insertObjects(() => {
+            newTemplate1.updateDataForUid(1, (data) => {
+                data['notification-count'] = 10;
+                return data;
+            });
+            newTemplate1.reloadObjectAtUid(1);
+        });
     }
 
-    var newTemplate2 = new TeaPlates('poc-wrapper-2', template, loadingTemplate);
-    newTemplate2.showLoading(3);
     setTimeout(() => {
-        insertData(newTemplate2);
-    }, 9000)
+        newTemplate1.hideLoading(newDS);
+    }, 1000);
 
-    setTimeout(() => {
-        insertData(newTemplate1, () => {
-            var obj = newTemplate1.removeObjectWithUID(2);
-            newTemplate2.setData(obj);
-            newTemplate2.insertObjects();
+    // var newTemplate2 = new TeaPlates('poc-wrapper-2', template, loadingTemplate);
+    // newTemplate2.showLoading(3);
+    // setTimeout(() => {
+    //     insertData(newTemplate2);
+    // }, 9000)
+
+    // setTimeout(() => {
+    //     insertData(newTemplate1, () => {
+    //         var obj = newTemplate1.removeObjectWithUID(2);
+    //         newTemplate2.setData(obj);
+    //         newTemplate2.insertObjects();
             
-        });
-    }, 5000)
+    //     });
+    // }, 5000)
 
-    var newTemplate3 = new TeaPlates('poc-wrapper-3', template, loadingTemplate);
-    newTemplate3.showLoading(4);
-    setTimeout(() => {
-        insertData(newTemplate3);
-    }, 10000)
+    // var newTemplate3 = new TeaPlates('poc-wrapper-3', template, loadingTemplate);
+    // newTemplate3.showLoading(4);
+    // setTimeout(() => {
+    //     insertData(newTemplate3);
+    // }, 10000)
 
-    var newTemplate4 = new TeaPlates('poc-wrapper-4', template, loadingTemplate);
-    newTemplate4.showLoading(2);
-    setTimeout(() => {
-        insertData(newTemplate4);
-    }, 3000)
+    // var newTemplate4 = new TeaPlates('poc-wrapper-4', template, loadingTemplate);
+    // newTemplate4.showLoading(2);
+    // setTimeout(() => {
+    //     insertData(newTemplate4);
+    //     setTimeout(() => {
+    //         newTemplate4.updateDataForUid(1, (data) => {
+    //             data['notification-count'] = 10;
+    //             return data;
+    //         });
+    //         newTemplate4.reloadObjectAtUid(1);
+    //     }, 2000);
+    // }, 3000)
 
-    var newTemplate5 = new TeaPlates('poc-wrapper-5', template, loadingTemplate);
-    newTemplate5.showLoading(5);
-    setTimeout(() => {
-        insertData(newTemplate5);
-    }, 12000)
+    // var newTemplate5 = new TeaPlates('poc-wrapper-5', template, loadingTemplate);
+    // newTemplate5.showLoading(5);
+    // setTimeout(() => {
+    //     insertData(newTemplate5);
+    // }, 12000)
 }
 
 window.onload = setup;
