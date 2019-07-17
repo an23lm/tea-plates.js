@@ -158,6 +158,26 @@ class TeaPlates {
         );
     }
 
+    updateDataForUid(uid, callback) {
+        this.jsonData[`uid-${uid}`] = callback(this.jsonData[`uid-${uid}`]);
+    }
+
+    reloadObjectAtUid(uid) {
+        let data = this.jsonData[`uid-${uid}`];
+        let newTpl = this.pTP_createTemplate(this.template(data), uid);
+        let newEle = this.pTP_CreateElementFromString(newTpl.templateString, uid);
+
+        let element = undefined;
+        this.insertedElements.forEach((ele) => {
+            if (ele.getAttribute('uid') == uid) {
+                element = ele;
+            }
+        });
+        if (element == undefined) return;
+
+        element.parentNode.replaceChild(newEle, element);
+    }
+
     removeObjectAtIndex(index, completion = () => {}) {
         let element = this.insertedElements[index];
         let elementStyle = window.getComputedStyle(element);
@@ -181,7 +201,6 @@ class TeaPlates {
             if (ele.getAttribute('uid') == uid) {
                 element = ele;
                 index = i;
-                break;
             }
         });
         if (element == undefined) return;
