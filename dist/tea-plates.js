@@ -91,28 +91,6 @@ class TeaPlates {
             });
     }
 
-    removeAllObjects(completion = () => {}) {
-        let completionPromise = [];
-        this.insertedElements.slice().reverse()
-            .forEach((element, index) => {
-                let promise = new Promise((resolve, _reject) => {
-                    setTimeout(() => {
-                        element.classList.add("animate-out");
-                        setTimeout(() => {
-                            document.getElementById(this.wrapperId).removeChild(element);
-                            resolve();
-                        }, this.animationTime, element, this, index);
-                    }, this.delta * index, element, this, index);
-                });
-                completionPromise.push(promise);
-            });
-        Promise.all(completionPromise)
-            .then(() => {
-                this.insertedElements = [];
-                completion();
-            });
-    }
-
     registerEventListeners(eventType, eventHandler, options = false) {
         let listener = {
             'type': eventType,
@@ -173,6 +151,7 @@ class TeaPlates {
         this.insertedElements.forEach((ele, i) => {
             if (ele.getAttribute('uid') == uid) {
                 element = ele;
+                index = i;
             }
         });
         if (element == undefined) return;
@@ -226,6 +205,28 @@ class TeaPlates {
         }, this.animationTime, element, this, index);
 
         return this.jsonData[`uid-${uid}`];
+    }
+
+    removeAllObjects(completion = () => {}) {
+        let completionPromise = [];
+        this.insertedElements.slice().reverse()
+            .forEach((element, index) => {
+                let promise = new Promise((resolve, _reject) => {
+                    setTimeout(() => {
+                        element.classList.add("animate-out");
+                        setTimeout(() => {
+                            document.getElementById(this.wrapperId).removeChild(element);
+                            resolve();
+                        }, this.animationTime, element, this, index);
+                    }, this.delta * index, element, this, index);
+                });
+                completionPromise.push(promise);
+            });
+        Promise.all(completionPromise)
+            .then(() => {
+                this.insertedElements = [];
+                completion();
+            });
     }
 
     pTP_CreateElementFromString(htmlString, uid = -1) {
