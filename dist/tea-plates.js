@@ -168,14 +168,22 @@ class TeaPlates {
         let newEle = this.pTP_CreateElementFromString(newTpl.templateString, uid);
 
         let element = undefined;
-        this.insertedElements.forEach((ele) => {
+        let index = undefined;
+
+        this.insertedElements.forEach((ele, i) => {
             if (ele.getAttribute('uid') == uid) {
                 element = ele;
             }
         });
         if (element == undefined) return;
 
+        this.insertedElements[index] = newEle;
+
         element.parentNode.replaceChild(newEle, element);
+
+        this.eventListeners.forEach(
+            listener => this.pTP_AddEventListeners([newEle], listener)
+        );
     }
 
     removeObjectAtIndex(index, completion = () => {}) {
