@@ -1,11 +1,9 @@
 class TeaPlates {
-
-    delta = 80;
-    animationTime = 300;
-
-    pTP_uid = 0;
-
     constructor(wrapperId, template, loadingTemplate, noDataTemplate) {
+        this.delta = 80;
+        this.animationTime = 300;
+        this.pTP_uid = 0;
+
         this.jsonData = {};
         this.wrapperId = wrapperId;
         this.template = template;
@@ -72,7 +70,7 @@ class TeaPlates {
     insertObjects(completion = () => {}) {
         let completionPromise = [];
         this.newElements.forEach((element, index) => {
-            let promise = new Promise((resolve, _reject) => {
+            let promise = new Promise((resolve) => {
                 setTimeout(() => {
                     element.classList.add("animate-in");
                     document.getElementById(this.wrapperId).appendChild(element);
@@ -213,7 +211,7 @@ class TeaPlates {
         let completionPromise = [];
         this.insertedElements.slice().reverse()
             .forEach((element, index) => {
-                let promise = new Promise((resolve, _reject) => {
+                let promise = new Promise((resolve) => {
                     setTimeout(() => {
                         element.classList.add("animate-out");
                         setTimeout(() => {
@@ -238,7 +236,7 @@ class TeaPlates {
         return div.firstChild;
     }
 
-    showNoDataElement(completion) {
+    showNoDataElement(completion = () => {}) {
         this.noDataElement = this.pTP_CreateElementFromString(this.noDataTemplate, `no-data`);
         this.noDataElement.classList.add("animate-in");
         document.getElementById(this.wrapperId).appendChild(this.noDataElement);
@@ -248,7 +246,7 @@ class TeaPlates {
         }, this.animationTime, this);
     }
 
-    removeNoDataElement(completion) {
+    removeNoDataElement(completion = () => {}) {
         if (this.noDataElement == null) return;
         this.noDataElement.classList.add("animate-out");
         setTimeout(() => {
