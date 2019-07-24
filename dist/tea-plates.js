@@ -5,14 +5,16 @@ class TeaPlates {
 
     pTP_uid = 0;
 
-    constructor(wrapperId, template, loadingTemplate) {
+    constructor(wrapperId, template, loadingTemplate, noDataTemplate) {
         this.jsonData = {};
         this.wrapperId = wrapperId;
         this.template = template;
         this.loadingTemplate = loadingTemplate;
+        this.noDataTemplate = noDataTemplate;
         this.newElements = [];
         this.insertedElements = [];
         this.loadingElements = [];
+        this.noDataElement = null;
         this.eventListeners = [];
     }
 
@@ -236,6 +238,25 @@ class TeaPlates {
         return div.firstChild;
     }
 
+    showNoDataElement(completion) {
+        this.noDataElement = this.pTP_CreateElementFromString(this.noDataTemplate, `no-data`);
+        this.noDataElement.classList.add("animate-in");
+        document.getElementById(this.wrapperId).appendChild(this.noDataElement);
+        setTimeout(() => {
+            this.noDataElement.classList.remove("animate-in");
+            completion();
+        }, this.animationTime, this);
+    }
+
+    removeNoDataElement(completion) {
+        if (this.noDataElement == null) return;
+        this.noDataElement.classList.add("animate-out");
+        setTimeout(() => {
+            document.getElementById(this.wrapperId).removeChild(this.noDataElement);
+            completion();
+        }, this.animationTime, this);
+    }
+
     showLoading(count = 1, completion = () => {}) {
         for (let i = 0; i < count; i++) {
             this.loadingElements.push(this.pTP_CreateElementFromString(this.loadingTemplate, `load-${i}`));
@@ -248,7 +269,7 @@ class TeaPlates {
                     document.getElementById(this.wrapperId).appendChild(element);
                     setTimeout(() => {
                         element.classList.remove("animate-in");
-                        resolve()
+                        resolve();
                     }, this.animationTime, element, this);
                 }, this.delta * index, element);
             });
