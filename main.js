@@ -23,7 +23,8 @@ function setup() {
         console.log(data);
     }
 
-    var newTemplate1 = new TeaPlates('poc-wrapper-1', template, loadingTemplate);
+    let noData = `<div>No Data available</div>`
+    var newTemplate1 = new TeaPlates('poc-wrapper-1', template, loadingTemplate, noData);
     newTemplate1.registerEventListeners('click', onclick);
     newTemplate1.showLoading(1);
 
@@ -35,11 +36,14 @@ function setup() {
                 return data;
             });
             newTemplate1.reloadObjectAtUid(1);
+
+            newTemplate1.removeAllObjects();
         });
     }
 
     setTimeout(() => {
-        newTemplate1.hideLoading(newDS);
+        newTemplate1.hideLoading();
+        newTemplate1.showNoDataElement();
     }, 1000);
 
     // var newTemplate2 = new TeaPlates('poc-wrapper-2', template, loadingTemplate);
