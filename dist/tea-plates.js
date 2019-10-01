@@ -1,4 +1,11 @@
 class TeaPlates {
+    /**
+     * @summary class constructor
+     * @param {String} wrapperId wrapper ID to insert template objects in
+     * @param {Function} template template function which will be called with data and should return template string
+     * @param {String} loadingTemplate template function which will be called to get a loading template string
+     * @param {String} noDataTemplate template function which will be called to get "no data" template string
+     */
     constructor(wrapperId, template, loadingTemplate, noDataTemplate) {
         this.delta = 80;
         this.animationTime = 300;
@@ -14,8 +21,59 @@ class TeaPlates {
         this.loadingElements = [];
         this.noDataElement = null;
         this.eventListeners = [];
+
+        this.initQueue();
     }
 
+    initQueue() {
+        var Queue = (function(){
+            function Queue() {};
+        
+            Queue.prototype.isRunning = false;
+            Queue.prototype.queue = [];
+        
+            Queue.prototype.add_function = function(execFunc, callback) { 
+                var _this = this;
+                //add callback to the queue
+                function cb() {
+                    callback();
+                    _this.next();
+                }
+
+                this.queue.push(function() {
+                    execFunc(cb);
+                });
+        
+                if(!this.isRunning) {
+                    // if nothing is running, then start the engines!
+                    this.next();
+                }
+        
+                return this; // for chaining fun!
+            }
+        
+            Queue.prototype.next = function(){
+                this.isRunning = false;
+                //get the first element off the queue
+                var shift = this.queue.shift(); 
+                if (shift) { 
+                    this.isRunning = true;
+                    shift(); 
+                }
+            }
+        
+            return Queue;
+        
+        })();
+
+        this.queue = new Queue;
+    }
+
+    /**
+     * @summary jdata is parased and templates objects are created
+     * @param {Array or Javascript Object} jdata data used to create template/s
+     * @access public
+     */ 
     setData(jdata) {
         let templateObjects = [];
         if (Array.isArray(jdata)) {
@@ -39,7 +97,13 @@ class TeaPlates {
             listener => this.pTP_AddEventListeners(this.newElements, listener)
         );
     }
-
+    
+    /**
+     * @summary get an object with uid and template string
+     * @param {String} templateString 
+     * @param {Number} uid 
+     * @access private
+     */
     pTP_createTemplate(templateString, uid) {
         return {
             'templateString': templateString,
@@ -47,27 +111,24 @@ class TeaPlates {
         };
     }
 
+    /**
+     * remove all stored data
+     */
     removeData() {
         this.jsonData = {};
         this.newElements = [];
     }
 
-    // parseTemplate() {
-    //     let regex = /#\{[\n ]*?.*?[\n ]*?\}/g;
-    //     let result = [...this.template.match(regex)];
-    //     this.templateKeys = result.map(res => res.replace(/[#{ \?)\n}]/g, ''));
-    // }
-
-    // createTemplateObject(values) {
-    //     let templateObject = this.template;
-    //     values.forEach(val => {
-    //         templateObject = templateObject.replace(/#\{[\n ]*?.*?[\n ]*?\}/, val); 
-    //     });
-
-    //     return templateObject;
-    // }
-
+    /**
+     * @summary use function to insert created objects into the wrapper div
+     * @param {Function} completion function is called when all objects are inserted and done animating
+     */
     insertObjects(completion = () => {}) {
+        let method = this.pTP_insertObjects.bind(this);
+        this.queue.add_function(method, completion);
+    }
+
+    pTP_insertObjects(completion = () => {}) {
         let completionPromise = [];
         this.newElements.forEach((element, index) => {
             let promise = new Promise((resolve) => {
@@ -166,6 +227,11 @@ class TeaPlates {
     }
 
     removeObjectAtIndex(index, completion = () => {}) {
+        let method = this.pTP_removeObjectAtIndex.bind(this, index);
+        this.queue.add_function(method, completion);
+    }
+
+    pTP_removeObjectAtIndex(index, completion = () => {}) {
         let element = this.insertedElements[index];
         let elementStyle = window.getComputedStyle(element);
         let height = element.offsetHeight;
@@ -182,6 +248,11 @@ class TeaPlates {
     }
 
     removeObjectWithUID(uid, completion = () => {}) {
+        let method = this.pTP_removeObjectWithUID.bind(this, uid);
+        this.queue.add_function(method, completion);
+    }
+
+    pTP_removeObjectWithUID(uid, completion = () => {}) {
         let element = undefined;
         let index = undefined;
         this.insertedElements.forEach((ele, i) => {
@@ -208,6 +279,11 @@ class TeaPlates {
     }
 
     removeAllObjects(completion = () => {}) {
+        let method = this.pTP_removeAllObjects.bind(this);
+        this.queue.add_function(method, completion);
+    }
+
+    pTP_removeAllObjects(completion = () => {}) {
         let completionPromise = [];
         this.insertedElements.slice().reverse()
             .forEach((element, index) => {
@@ -237,6 +313,11 @@ class TeaPlates {
     }
 
     showNoDataElement(completion = () => {}) {
+        let method = this.pTP_showNoDataElement.bind(this);
+        this.queue.add_function(method, completion);
+    }
+
+    pTP_showNoDataElement(completion = () => {}) {
         this.noDataElement = this.pTP_CreateElementFromString(this.noDataTemplate, `no-data`);
         this.noDataElement.classList.add("animate-in");
         document.getElementById(this.wrapperId).appendChild(this.noDataElement);
@@ -247,6 +328,11 @@ class TeaPlates {
     }
 
     removeNoDataElement(completion = () => {}) {
+        let method = this.pTP_removeNoDataElement.bind(this);
+        this.queue.add_function(method, completion);
+    }
+
+    pTP_removeNoDataElement(completion = () => {}) {
         if (this.noDataElement == null) return;
         this.noDataElement.classList.add("animate-out");
         setTimeout(() => {
@@ -256,6 +342,11 @@ class TeaPlates {
     }
 
     showLoading(count = 1, completion = () => {}) {
+        let method = this.pTP_showLoading.bind(this, count);
+        this.queue.add_function(method, completion);
+    }
+
+    pTP_showLoading(count, completion = () => {}) {
         for (let i = 0; i < count; i++) {
             this.loadingElements.push(this.pTP_CreateElementFromString(this.loadingTemplate, `load-${i}`));
         }
@@ -279,6 +370,11 @@ class TeaPlates {
     }
 
     hideLoading(completion = () => {}) {
+        let method = this.pTP_hideLoading.bind(this);
+        this.queue.add_function(method, completion);
+    }
+
+    pTP_hideLoading(completion = () => {}) {
         let completionPromise = [];
         this.loadingElements.slice().reverse()
             .forEach((element, index) => {

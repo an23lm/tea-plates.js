@@ -36,16 +36,15 @@ function setup() {
                 return data;
             });
             newTemplate1.reloadObjectAtUid(1);
-
-            newTemplate1.removeAllObjects();
         });
     }
 
     setTimeout(() => {
         newTemplate1.hideLoading();
-        newTemplate1.showNoDataElement();
+        newDS();
+        newTemplate1.removeAllObjects();
     }, 1000);
-
+    
     // var newTemplate2 = new TeaPlates('poc-wrapper-2', template, loadingTemplate);
     // newTemplate2.showLoading(3);
     // setTimeout(() => {
