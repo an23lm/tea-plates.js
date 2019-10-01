@@ -23,6 +23,8 @@ class TeaPlates {
         this.eventListeners = [];
 
         this.initQueue();
+
+        this.isLoading = true;
     }
 
     initQueue() {
@@ -342,6 +344,7 @@ class TeaPlates {
     }
 
     showLoading(count = 1, completion = () => {}) {
+        if (!this.isLoading) return;
         let method = this.pTP_showLoading.bind(this, count);
         this.queue.add_function(method, completion);
     }
