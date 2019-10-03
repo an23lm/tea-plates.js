@@ -25,7 +25,7 @@ class TeaPlates {
 
         this.pTP_initQueue();
 
-        this.isLoading = true;
+        this.isLoading = false;
     }
 
     /**
@@ -419,7 +419,7 @@ class TeaPlates {
     }
 
     showLoading(count = 1, completion = () => {}) {
-        if (!this.isLoading) return;
+        if (this.isLoading) return;
         this.isLoading = true;
         let method = this.pTP_showLoading.bind(this, count);
         this.queue.add_function(method, completion);

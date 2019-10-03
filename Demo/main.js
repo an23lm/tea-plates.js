@@ -26,7 +26,7 @@ function setup() {
     let noData = `<div>No Data available</div>`
     var newTemplate1 = new TeaPlates('poc-wrapper-1', template, loadingTemplate, noData);
     newTemplate1.registerEventListeners('click', onclick);
-    newTemplate1.showLoading(1);
+    newTemplate1.showLoading(3);
 
     function newDS() {
         newTemplate1.setData(jsondata);
@@ -40,11 +40,14 @@ function setup() {
     }
 
     setTimeout(() => {
-        newTemplate1.hideLoading();
         newDS();
-        newTemplate1.removeAllObjects();
-    }, 1000);
+        // newTemplate1.removeAllObjects();
+    }, 5000);
     
+    setTimeout(() => {
+        newTemplate1.showLoading(3);
+    }, 10000);
+
     // var newTemplate2 = new TeaPlates('poc-wrapper-2', template, loadingTemplate);
     // newTemplate2.showLoading(3);
     // setTimeout(() => {
