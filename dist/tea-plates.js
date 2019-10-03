@@ -1,10 +1,11 @@
 class TeaPlates {
     /**
-     * @summary class constructor
-     * @param {String} wrapperId wrapper ID to insert template objects in
-     * @param {Function} template template function which will be called with data and should return template string
-     * @param {String} loadingTemplate template function which will be called to get a loading template string
-     * @param {String} noDataTemplate template function which will be called to get "no data" template string
+     * @summary class constructor.
+     * @param {String} wrapperId wrapper ID to insert template objects in.
+     * @param {Function} template template function which will be called with data and should return template string.
+     * @param {String} loadingTemplate template function which will be called to get a loading template string.
+     * @param {String} noDataTemplate template function which will be called to get "no data" template string.
+     * @access private
      */
     constructor(wrapperId, template, loadingTemplate, noDataTemplate) {
         this.delta = 80;
@@ -22,12 +23,16 @@ class TeaPlates {
         this.noDataElement = null;
         this.eventListeners = [];
 
-        this.initQueue();
+        this.pTP_initQueue();
 
         this.isLoading = true;
     }
 
-    initQueue() {
+    /**
+     * @summary initalize the dom manupulation queue.
+     * @access private
+     */
+    pTP_initQueue() {
         var Queue = (function(){
             function Queue() {};
         
@@ -72,7 +77,7 @@ class TeaPlates {
     }
 
     /**
-     * @summary jdata is parased and templates objects are created
+     * @summary jdata is parased and templates objects are created.
      * @param {Array or Javascript Object} jdata data used to create template/s
      * @access public
      */ 
@@ -101,7 +106,7 @@ class TeaPlates {
     }
     
     /**
-     * @summary get an object with uid and template string
+     * @summary get an object with uid and template string.
      * @param {String} templateString 
      * @param {Number} uid 
      * @access private
@@ -114,7 +119,8 @@ class TeaPlates {
     }
 
     /**
-     * remove all stored data
+     * @summary remove all the data.
+     * @access public
      */
     removeData() {
         this.jsonData = {};
@@ -122,14 +128,21 @@ class TeaPlates {
     }
 
     /**
-     * @summary use function to insert created objects into the wrapper div
-     * @param {Function} completion function is called when all objects are inserted and done animating
+     * @summary hide loading elements and queue insert objects into the wrapper div.
+     * @param {Function} completion function is called when all objects are inserted and done animating.
+     * @access public
      */
     insertObjects(completion = () => {}) {
+        this.hideLoading();
         let method = this.pTP_insertObjects.bind(this);
         this.queue.add_function(method, completion);
     }
 
+    /**
+     * @summary insert objects into the wrapper div.
+     * @param {Function} completion 
+     * @access private
+     */
     pTP_insertObjects(completion = () => {}) {
         let completionPromise = [];
         this.newElements.forEach((element, index) => {
@@ -154,6 +167,15 @@ class TeaPlates {
             });
     }
 
+    /**
+     * @summary register an event listner on the top level div on the template.
+     * @param {String} eventType type of event listener.
+     * @param {Function} eventHandler event handler function.
+     * @param {Object} options specifies characteristics about the event listener.
+     * @returns ID for of the registered event listener, use this to unregister the listener.
+     * @access public
+     * @link https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
+     */
     registerEventListeners(eventType, eventHandler, options = false) {
         let listener = {
             'type': eventType,
@@ -166,13 +188,25 @@ class TeaPlates {
         return index
     }
 
-    unregisterEventListeners(index) {
-        let removedEL = this.eventListeners.splice(index, 1);
+    /**
+     * @summary unregister an event listener
+     * @param {*} eventListenerId the event listener ID received while registering the event listener
+     * @returns the removed event listener object
+     * @access public
+     */
+    unregisterEventListeners(eventListenerId) {
+        let removedEL = this.eventListeners.splice(eventListenerId, 1);
         this.pTP_RemoveEventListeners(this.insertedElements, removedEL);
         this.pTP_RemoveEventListeners(this.newElements, removedEL);
         return removedEL;
     }
 
+    /**
+     * @summary private method to add event listener
+     * @param {Element[]} elements 
+     * @param {Object} eventListener 
+     * @access private
+     */
     pTP_AddEventListeners(elements, eventListener) {
         let self = this;
         elements.forEach(element => {
@@ -193,16 +227,33 @@ class TeaPlates {
         }
     }
 
+    /**
+     * @summary private method to remove event listener
+     * @param {Element[]} elements 
+     * @param {Object} eventListener
+     * @access private 
+     */
     pTP_RemoveEventListeners(elements, eventListener) {
         elements.forEach(element =>
             element.removeEventListener(eventListener.type, eventListener.handerRef, eventListener.options)
         );
     }
 
+    /**
+     * @summary update the data for template object with UID
+     * @param {Number} uid Unique ID of the template object
+     * @param {Function} callback calls callback function with json data at the UID. Callback function should return the modified json data.
+     * @access public
+     */
     updateDataForUid(uid, callback) {
         this.jsonData[`uid-${uid}`] = callback(this.jsonData[`uid-${uid}`]);
     }
 
+    /**
+     * @summary after updateDataForUid use this function to reload the dom object
+     * @param {Number} uid Unique ID of the template object
+     * @access public
+     */
     reloadObjectAtUid(uid) {
         let data = this.jsonData[`uid-${uid}`];
         let newTpl = this.pTP_createTemplate(this.template(data), uid);
@@ -228,11 +279,23 @@ class TeaPlates {
         );
     }
 
+    /**
+     * @summary queues remove a template object from DOM at index
+     * @param {Number} index of object in DOM
+     * @param {Function} completion 
+     * @access public
+     */
     removeObjectAtIndex(index, completion = () => {}) {
         let method = this.pTP_removeObjectAtIndex.bind(this, index);
         this.queue.add_function(method, completion);
     }
 
+    /**
+     * @summary private function to remove DOM object at index
+     * @param {Number} index of object in DOM
+     * @param {Function} completion
+     * @access private
+     */
     pTP_removeObjectAtIndex(index, completion = () => {}) {
         let element = this.insertedElements[index];
         let elementStyle = window.getComputedStyle(element);
@@ -249,11 +312,23 @@ class TeaPlates {
         }, this.animationTime, element, this, index);
     }
 
+    /**
+     * @summary queues remove a template object from DOM with UID 
+     * @param {Number} uid of the DOM elements
+     * @param {Function} completion 
+     * @access public
+     */
     removeObjectWithUID(uid, completion = () => {}) {
         let method = this.pTP_removeObjectWithUID.bind(this, uid);
         this.queue.add_function(method, completion);
     }
 
+    /**
+     * @summary private function remove a template object from DOM with UID 
+     * @param {Number} uid of the DOM elements
+     * @param {Function} completion 
+     * @access private
+     */
     pTP_removeObjectWithUID(uid, completion = () => {}) {
         let element = undefined;
         let index = undefined;
@@ -345,6 +420,7 @@ class TeaPlates {
 
     showLoading(count = 1, completion = () => {}) {
         if (!this.isLoading) return;
+        this.isLoading = true;
         let method = this.pTP_showLoading.bind(this, count);
         this.queue.add_function(method, completion);
     }
@@ -373,6 +449,7 @@ class TeaPlates {
     }
 
     hideLoading(completion = () => {}) {
+        this.isLoading = false;
         let method = this.pTP_hideLoading.bind(this);
         this.queue.add_function(method, completion);
     }
