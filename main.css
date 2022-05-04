@@ -8,11 +8,13 @@ body {
 .title {
     font-size: 3em;
     text-align: center;
+    color: #222;
 }
 
 .content-wrapper {
+    margin-top: 10pt;
     height: 90vh;
-    overflow: auto;
+    overflow: visible;
 }
 
 .content {
@@ -31,6 +33,7 @@ body {
 }
 
 .col .title {
+    overflow: visible;
     text-align: center;
     font-weight: 500;
     font-size: 25pt;
