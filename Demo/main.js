@@ -93,7 +93,7 @@ function setup() {
 	setTimeout(() => {
 		newTemplate3.hideLoading();
 		newTemplate3.showNoDataElement();
-	}, 4000);
+	}, 9000);
 
 	var newTemplate4 = new TeaPlates(
 		"poc-wrapper-4",
