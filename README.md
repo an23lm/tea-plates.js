@@ -3,12 +3,15 @@
 
 Tea-Plates accepts JSON and a creates a templating string from the provided JSON Object.
 
+## Demo
+https://an23lm.github.io/tea-plates.js/
+
 ## How to Install
 - Download the `tea-plates.js` file from the `dist/` folder and import it to your project.
 ### OR
 - CDN
 	- Latest Release
-		- `<script src="https://cdn.jsdelivr.net/gh/an23lm/tea-plates.js/dist/tea-plates.js></script>`
+		- `<script src="https://cdn.jsdelivr.net/gh/an23lm/tea-plates.js/dist/tea-plates.js"></script>`
 	- Latest from a major version
 		- `https://cdn.jsdelivr.net/gh/an23lm/tea-plates.js@{major-version-number}/dist/tea-plates.js`
 	- Latest from a minor version
