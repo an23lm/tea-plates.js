@@ -4,9 +4,9 @@
 
 Tea-Plates accepts JSON and a creates a templating string from the provided JSON Object.
 
-## Demo
+## [Demo](https://an23lm.github.io/tea-plates.js/)
+![Demo Screenshot](https://user-images.githubusercontent.com/5507600/167162338-a3bf53a2-4130-4707-939a-367eda62a901.gif)
 
-https://an23lm.github.io/tea-plates.js/
 
 ## How to Install
 
